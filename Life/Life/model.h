@@ -29,6 +29,9 @@ private:
     void notifyFieldDimensionsChanged() const;
     void notifyFieldChanged() const;
 
+
+    void lifeStep();
+    int neighboursCount(int row, int col);
 public:
     // Accessors
     size_t width() const;
