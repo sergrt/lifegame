@@ -11,3 +11,7 @@ void Controller::setupView(Ui::LifeClass* const ui) {
     ui->frameGrid->setLayout(new QGridLayout());
     ui->frameGrid->layout()->addWidget(view_.get());
 }
+
+void Controller::randomize() const {
+    model_->randomize();
+}
