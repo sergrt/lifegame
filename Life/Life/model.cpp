@@ -5,6 +5,10 @@
 Model::Model() {
     fieldWidth_ = 12;
     fieldHeight_ = 12;
+    field_.resize(fieldHeight_);
+    for (auto& f : field_)
+        f.resize(fieldWidth_, 0);
+
     //notifyFieldDimensionsChanged();
 }
 

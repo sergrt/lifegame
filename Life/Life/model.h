@@ -13,6 +13,8 @@ private:
     size_t fieldWidth_;
     size_t fieldHeight_;
 
+    std::vector<std::vector<int>> field_;
+
     void notifyFieldDimensionsChanged() const;
 };
 

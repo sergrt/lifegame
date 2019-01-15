@@ -11,6 +11,6 @@ public:
     Controller();
     void setupView(Ui::LifeClass* const ui);
 private:
-    Model* model_;
-    Grid* view_;
+    std::unique_ptr<Model> model_;
+    std::unique_ptr<Grid> view_;
 };

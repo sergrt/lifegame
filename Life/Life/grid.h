@@ -14,6 +14,7 @@ public:
 
     // Observer
     virtual void fieldDimensionsChanged() override;
+    virtual void fieldChanged() override;
 protected:
     void paintEvent(QPaintEvent*) override;
 private:

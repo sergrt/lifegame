@@ -38,3 +38,9 @@ void Grid::paintEvent(QPaintEvent*) {
 void Grid::fieldDimensionsChanged() {
     this->repaint();
 }
+void Grid::fieldChanged() {
+    auto field = model_->field();
+
+
+}
+
