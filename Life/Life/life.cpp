@@ -12,6 +12,9 @@ Life::Life(QWidget *parent)
     connect(ui.randomize, &QPushButton::pressed, this, [this]() {
         controller_.randomize();
     });
+    connect(ui.manual, &QPushButton::pressed, this, [this]() {
+        controller_.setFieldEditable(!ui.manual->isChecked());
+    });
 
 }
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "grid.h"
 #include "model.h"
+#include "controller.h"
 
 Grid::Grid(Model* model, Controller* controller)
     : model_{ model }, controller_{ controller } {
@@ -56,3 +57,23 @@ void Grid::fieldChanged() {
     repaint();
 }
 
+std::pair<int, int> Grid::pointCoordsToFieldCoords(const QPoint& p) const {
+    const size_t rowCount = model_->height();
+    const size_t colCount = model_->width();
+    const int width = this->width();
+    const int height = this->height();
+    const int cellHeight = (height - 1) / colCount; // TODO: cache. Set as optional
+    const int cellWidth = (width - 1) / rowCount;
+
+    auto res = std::make_pair<int, int>(p.y() / cellHeight, p.x() / cellWidth);
+    return res;
+}
+
+void Grid::mousePressEvent(QMouseEvent* e) {
+    if (controller_->fieldEditable()) {
+        auto fieldCoords = pointCoordsToFieldCoords(e->pos());
+        controller_->toggleFieldItem(fieldCoords);
+    }
+
+    QWidget::mousePressEvent(e);
+}

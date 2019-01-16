@@ -17,7 +17,10 @@ public:
     virtual void fieldChanged() override;
 protected:
     void paintEvent(QPaintEvent*) override;
+    void mousePressEvent(QMouseEvent* e) override;
 private:
     Model* model_;
     Controller* controller_;
+
+    std::pair<int, int> pointCoordsToFieldCoords(const QPoint& p) const;
 };

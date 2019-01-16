@@ -16,7 +16,7 @@ Model::Model() {
         lifeStep();
         notifyFieldChanged();
     });
-    timer_.start(500);
+    //timer_.start(500);
 }
 
 Model::~Model() {
@@ -99,4 +99,10 @@ void Model::lifeStep() {
         }
     }
     field_ = newField;
+}
+
+void Model::toggleFieldItem(const std::pair<int, int>& c) {
+    const auto oldVal = field_[c.first][c.second];
+    field_[c.first][c.second] = oldVal == 0 ? 1 : 0;
+    notifyFieldChanged();
 }

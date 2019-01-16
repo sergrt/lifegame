@@ -13,9 +13,7 @@ public:
 
     // External handlers
     void randomize();
-
-
-    
+    void toggleFieldItem(const std::pair<int, int>& c);
     
 private:
     std::vector<Observer*> observers_;
