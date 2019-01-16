@@ -9,8 +9,6 @@ Model::Model() {
     field_.resize(fieldHeight_);
     for (auto& f : field_)
         f.resize(fieldWidth_, 0);
-
-
     
     QObject::connect(&timer_, &QTimer::timeout, this, [this]() {
         lifeStep();
@@ -33,6 +31,12 @@ void Model::notifyFieldChanged() const {
 
 void Model::addObserver(Observer* observer) {
     observers_.push_back(observer);
+}
+
+void Model::removeObserver(Observer* observer) {
+    observers_.erase(
+        std::find(std::begin(observers_), std::end(observers_), observer)
+    );
 }
 
 void Model::randomize() {

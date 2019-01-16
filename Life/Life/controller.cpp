@@ -18,13 +18,10 @@ void Controller::randomize() const {
     model_->randomize();
 }
 
-void Controller::toggleFieldItem(const std::pair<int, int>& c) {
+void Controller::fieldItemClick(const std::pair<int, int>& c) const {
     model_->toggleFieldItem(c);
 }
 
 void Controller::setFieldEditable(bool v) {
     fieldEditable_ = v;
-}
-bool Controller::fieldEditable() const {
-    return fieldEditable_;
 }

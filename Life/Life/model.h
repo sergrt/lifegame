@@ -10,6 +10,7 @@ public:
     ~Model();
 
     void addObserver(Observer* observer);
+    void removeObserver(Observer* observer);
 
     // External handlers
     void randomize();
