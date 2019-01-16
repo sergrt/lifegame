@@ -14,7 +14,7 @@ public:
 
     // External handlers
     void randomize();
-    void toggleFieldItem(const std::pair<int, int>& c);
+    void toggleFieldItem(const std::pair<size_t, size_t>& c);
     
 private:
     std::vector<Observer*> observers_;
@@ -35,6 +35,6 @@ public:
     // Accessors
     size_t width() const;
     size_t height() const;
-    int item(int row, int col) const;
+    int item(size_t row, size_t col) const;
 };
 

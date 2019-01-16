@@ -67,7 +67,7 @@ size_t Model::height() const {
     return fieldHeight_;
 }
 
-int Model::item(int row, int col) const {
+int Model::item(size_t row, size_t col) const {
     return field_[row][col];
 }
 
@@ -105,7 +105,7 @@ void Model::lifeStep() {
     field_ = newField;
 }
 
-void Model::toggleFieldItem(const std::pair<int, int>& c) {
+void Model::toggleFieldItem(const std::pair<size_t, size_t>& c) {
     const auto oldVal = field_[c.first][c.second];
     field_[c.first][c.second] = oldVal == 0 ? 1 : 0;
     notifyFieldChanged();

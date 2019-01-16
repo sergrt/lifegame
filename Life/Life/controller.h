@@ -13,7 +13,7 @@ public:
 
     // UI handling
     void randomize() const;
-    void fieldItemClick(const std::pair<int, int>& c) const;
+    void fieldItemClick(const std::pair<size_t, size_t>& c) const;
 
     void setFieldEditable(bool v);
 private:

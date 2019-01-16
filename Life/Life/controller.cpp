@@ -18,7 +18,7 @@ void Controller::randomize() const {
     model_->randomize();
 }
 
-void Controller::fieldItemClick(const std::pair<int, int>& c) const {
+void Controller::fieldItemClick(const std::pair<size_t, size_t>& c) const {
     model_->toggleFieldItem(c);
 }
 

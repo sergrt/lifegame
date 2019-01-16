@@ -85,7 +85,7 @@ void Grid::fieldChanged() {
 }
 
 std::pair<int, int> Grid::pointCoordsToFieldCoords(const QPoint& p) {
-    auto res = std::make_pair<int, int>(
+    auto res = std::make_pair<size_t, size_t>(
         static_cast<int>(p.y() / cellHeight()),
         static_cast<int>(p.x() / cellWidth()));
     
