@@ -4,6 +4,8 @@
 #include <random>
 
 Model::Model() {
+    simulationSpeed_ = 500;
+    currentStep_ = 0;
     fieldWidth_ = 24;
     fieldHeight_ = 24;
     field_.resize(fieldHeight_);
@@ -27,6 +29,18 @@ void Model::notifyFieldDimensionsChanged() const {
 void Model::notifyFieldChanged() const {
     for (const auto observer : observers_)
         observer->fieldChanged();
+}
+void Model::notifySimulationStopped() const {
+    for (const auto observer : observers_)
+        observer->simulationStopped();
+}
+void Model::notifyStepPerformed(int step) const {
+    for (const auto observer : observers_)
+        observer->stepPerformed(step);
+}
+void Model::notifyAllCellsAreDead() const {
+    for (const auto observer : observers_)
+        observer->allCellsAreDead();
 }
 
 void Model::addObserver(Observer* observer) {
@@ -103,10 +117,46 @@ void Model::lifeStep() {
         }
     }
     field_ = newField;
+    notifyStepPerformed(++currentStep_);
+    
+    if (allCellsAreDead()) {
+        notifyAllCellsAreDead();
+        // TODO: maybe stop here
+    }
+}
+bool Model::allCellsAreDead() const {
+    for (const auto& row : field_) {
+        for (const auto& cell : row) {
+            if (cell != 0)
+                return false;
+        }
+    }
+    return true;
 }
 
 void Model::toggleFieldItem(const std::pair<size_t, size_t>& c) {
     const auto oldVal = field_[c.first][c.second];
     field_[c.first][c.second] = oldVal == 0 ? 1 : 0;
     notifyFieldChanged();
+}
+
+void Model::startSimulation() {
+    timer_.start(simulationSpeed_);
+}
+void Model::stopSimulation() {
+    timer_.stop();
+}
+void Model::singleStep() {
+    stopSimulation();
+    notifySimulationStopped();
+    lifeStep();
+    notifyFieldChanged();
+}
+int Model::simulationSpeed() const {
+    return simulationSpeed_;
+}
+void Model::setSimulationSpeed(int s) {
+    simulationSpeed_ = s;
+    if (timer_.isActive())
+        timer_.start(simulationSpeed_);
 }

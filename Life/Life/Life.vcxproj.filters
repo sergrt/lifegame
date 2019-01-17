@@ -48,6 +48,9 @@
     <ClCompile Include="controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ui_controls_view.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -68,6 +71,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="model.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ui_controls_view.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
