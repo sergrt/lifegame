@@ -1,5 +1,6 @@
 #pragma once
 #include <QTimer>
+#include "model_named_types.h"
 class Observer;
 
 class Model : public QObject {
@@ -14,7 +15,7 @@ public:
 
     // External handlers
     void randomize();
-    void toggleFieldItem(const std::pair<size_t, size_t>& c);
+    void toggleFieldItem(Row row, Column col);
 
     void startSimulation();
     void stopSimulation();

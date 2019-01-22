@@ -2,13 +2,14 @@
 #include "controller.h"
 #include "ui_life.h"
 
-Controller::Controller() {
+Controller::Controller()
+    : fieldEditable_{ false } {
     model_ = std::make_unique<Model>();
     view_ = std::make_unique<Grid>(model_.get(), this);
     uiControlsView_ = std::make_unique<UiControlsView>(model_.get(), this);
 }
 
-void Controller::setupView(Ui::LifeClass* const ui) {
+void Controller::setupViews(Ui::LifeClass* const ui) const {
     ui->frameGrid->setLayout(new QGridLayout());
     ui->frameGrid->layout()->addWidget(view_.get());
     uiControlsView_->setUiPtr(ui);
@@ -18,24 +19,28 @@ void Controller::randomize() const {
     model_->randomize();
 }
 
-void Controller::fieldItemClick(const std::pair<size_t, size_t>& c) const {
-    model_->toggleFieldItem(c);
+void Controller::fieldItemClick(Row row, Column col) const {
+    model_->toggleFieldItem(row, col);
 }
 
-void Controller::setFieldEditable(bool v) {
-    fieldEditable_ = v;
+void Controller::setFieldEditable(bool editable) {
+    fieldEditable_ = editable;
 }
+
 void Controller::startSimulation() const {
     model_->startSimulation();
 }
+
 void Controller::stopSimulation() const {
     model_->stopSimulation();
 }
+
 void Controller::singleStep() const {
     model_->singleStep();
 }
-void Controller::setSimulationSpeed(int s) const {
-    model_->setSimulationSpeed(s);
+
+void Controller::setSimulationSpeed(int speed) const {
+    model_->setSimulationSpeed(speed);
 }
 
 bool Controller::fieldEditable() const {

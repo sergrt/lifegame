@@ -2,6 +2,7 @@
 #include <QWidget>
 #include "observer.h"
 #include <optional>
+#include "model_named_types.h"
 
 class Model;
 class Controller;
@@ -36,7 +37,8 @@ private:
     int cellHeight();
     void calcCellDimensions();
 
-    std::pair<int, int> pointCoordsToFieldCoords(const QPoint& p);
+    using FieldPoint = std::pair<Row, Column>;
+    FieldPoint pointCoordsToFieldCoords(const QPoint& p);
         // Cannot be const because it calls non-const functions.
         // TODO: think about it
 };

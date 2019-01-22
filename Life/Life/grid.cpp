@@ -85,17 +85,17 @@ void Grid::fieldChanged() {
     repaint();
 }
 
-std::pair<int, int> Grid::pointCoordsToFieldCoords(const QPoint& p) {
-    auto res = std::make_pair<size_t, size_t>(
-        static_cast<int>(p.y() / cellHeight()),
-        static_cast<int>(p.x() / cellWidth()));
+Grid::FieldPoint Grid::pointCoordsToFieldCoords(const QPoint& p) {
+    auto res = std::make_pair<Row, Column>(
+        Row(static_cast<int>(p.y() / cellHeight())),
+        Column(static_cast<int>(p.x() / cellWidth())));
     
     return res;
 }
 
 void Grid::mousePressEvent(QMouseEvent* e) {
-    const auto fieldCoords = pointCoordsToFieldCoords(e->pos());
-    controller_->fieldItemClick(fieldCoords);
+    const auto fieldPoint = pointCoordsToFieldCoords(e->pos());
+    controller_->fieldItemClick(fieldPoint.first, fieldPoint.second);
 
     QWidget::mousePressEvent(e);
 }

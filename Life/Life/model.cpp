@@ -134,9 +134,9 @@ bool Model::allCellsAreDead() const {
     return true;
 }
 
-void Model::toggleFieldItem(const std::pair<size_t, size_t>& c) {
-    const auto oldVal = field_[c.first][c.second];
-    field_[c.first][c.second] = oldVal == 0 ? 1 : 0;
+void Model::toggleFieldItem(Row row, Column col) {
+    const auto oldVal = field_[row.get()][col.get()];
+    field_[row.get()][col.get()] = oldVal == 0 ? 1 : 0;
     notifyFieldChanged();
 }
 

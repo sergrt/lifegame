@@ -10,7 +10,8 @@ Life::Life(QWidget *parent)
 
 void Life::paintEvent(QPaintEvent* event) {
     std::call_once(flagSetupView, [this]() {
-        controller_.setupView(&ui);
-        //applicationInitialized = true;
+        // Initialize views from the controller once at initial application
+        // repaint
+        controller_.setupViews(&ui);
     });
 }

@@ -62,6 +62,12 @@
     <ClInclude Include="controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NamedType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model_named_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="life.h">
