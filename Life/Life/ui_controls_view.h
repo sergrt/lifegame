@@ -21,6 +21,8 @@ public:
     void setUiPtr(Ui::LifeClass* const ui);
 private:
     Ui::LifeClass* ui_ = nullptr;
+    void syncWidthLabelText() const;
+    void syncHeightLabelText() const;
 
     Model* model_;
     Controller* controller_;

@@ -6,8 +6,8 @@
 Model::Model() {
     simulationSpeed_ = 500;
     currentStep_ = 0;
-    fieldWidth_ = 24;
-    fieldHeight_ = 24;
+    size_t fieldWidth_ = 24;
+    size_t fieldHeight_ = 24;
     field_.resize(fieldHeight_);
     for (auto& f : field_)
         f.resize(fieldWidth_, 0);
@@ -74,11 +74,11 @@ void Model::randomize() {
 }
 
 size_t Model::width() const {
-    return fieldWidth_;
+    return field_[0].size();
 }
 
 size_t Model::height() const {
-    return fieldHeight_;
+    return field_.size();
 }
 
 int Model::item(size_t row, size_t col) const {
@@ -159,4 +159,16 @@ void Model::setSimulationSpeed(int s) {
     simulationSpeed_ = s;
     if (timer_.isActive())
         timer_.start(simulationSpeed_);
+}
+
+void Model::resizeField(size_t w, size_t h) {
+    const size_t oldWidth = width();
+    const size_t oldHeight = height();
+    field_.resize(h, std::vector<int>(w, 0));
+    
+    for (size_t sz = std::min(height(), oldHeight), i = 0; i < sz; ++i)
+        field_[i].resize(w, 0);
+
+    if (oldHeight != height() || oldWidth != width())
+        notifyFieldDimensionsChanged();
 }

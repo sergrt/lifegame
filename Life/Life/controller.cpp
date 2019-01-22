@@ -41,3 +41,6 @@ void Controller::setSimulationSpeed(int s) const {
 bool Controller::fieldEditable() const {
     return fieldEditable_;
 }
+void Controller::resizeField(size_t width, size_t height) const {
+    model_->resizeField(width, height);
+}

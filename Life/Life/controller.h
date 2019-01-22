@@ -21,6 +21,7 @@ public:
     void stopSimulation() const;
     void singleStep() const;
     void setSimulationSpeed(int s) const;
+    void resizeField(size_t width, size_t height) const;
 
     bool fieldEditable() const;
 private:

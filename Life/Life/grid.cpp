@@ -18,9 +18,9 @@ void Grid::calcCellDimensions() {
     const size_t rowCount = model_->height();
     const size_t colCount = model_->width();
     const int width = this->width();
-    const int height = this->height();    
-    cellWidth_ = (width - 1) / rowCount;
-    cellHeight_ = (height - 1) / colCount;
+    const int height = this->height();
+    cellWidth_ = (width - 1) / colCount;
+    cellHeight_ = (height - 1) / rowCount;
 }
 
 int Grid::cellWidth() {
@@ -77,6 +77,7 @@ void Grid::paintEvent(QPaintEvent* e) {
 }
 
 void Grid::fieldDimensionsChanged() {
+    calcCellDimensions();
     this->repaint();
 }
 

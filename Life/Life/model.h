@@ -21,11 +21,9 @@ public:
     void singleStep();
     int simulationSpeed() const;
     void setSimulationSpeed(int s);
+    void resizeField(size_t w, size_t h);
 private:
     std::vector<Observer*> observers_;
-    size_t fieldWidth_;
-    size_t fieldHeight_;
-
     std::vector<std::vector<int>> field_;
 
     QTimer timer_;
