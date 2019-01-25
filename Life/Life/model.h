@@ -36,10 +36,14 @@ private:
     void notifySimulationStopped() const;
     void notifyStepPerformed(int step) const;
     void notifyAllCellsAreDead() const;
+    void notifyStepStagnation() const;
 
     void lifeStep();
     int neighboursCount(int row, int col);
     bool allCellsAreDead() const;
+
+    size_t previousHash_;
+    size_t calcFieldHash();
 public:
     // Accessors
     size_t width() const;

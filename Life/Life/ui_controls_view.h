@@ -17,6 +17,7 @@ public:
     virtual void simulationStopped() override;
     virtual void stepPerformed(int step) override;
     virtual void allCellsAreDead() override;
+    virtual void stepStagnation() override;
 
     void setUiPtr(Ui::LifeClass* const ui);
 private:

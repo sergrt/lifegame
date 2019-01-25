@@ -6,7 +6,7 @@
 
 UiControlsView::UiControlsView(Model* model, Controller* controller)
     : model_{ model },
-    controller_{ controller }{
+    controller_{ controller } {
     
     model_->addObserver(this);
 }
@@ -76,4 +76,8 @@ void UiControlsView::stepPerformed(int step) {
 void UiControlsView::allCellsAreDead() {
     if (ui_)
         ui_->log->append("All cells are dead");
+}
+void UiControlsView::stepStagnation() {
+    if (ui_)
+        ui_->log->append("Step stagnation detected");
 }

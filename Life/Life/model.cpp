@@ -3,14 +3,15 @@
 #include "observer.h"
 #include <random>
 
-Model::Model() {
-    simulationSpeed_ = 500;
-    currentStep_ = 0;
-    size_t fieldWidth_ = 24;
-    size_t fieldHeight_ = 24;
-    field_.resize(fieldHeight_);
+Model::Model()
+    : simulationSpeed_ { 500 },
+    currentStep_ { 0 },
+    previousHash_ { 0 } {    
+    const auto fieldWidth = size_t(24);
+    const auto fieldHeight = size_t(24);
+    field_.resize(fieldHeight);
     for (auto& f : field_)
-        f.resize(fieldWidth_, 0);
+        f.resize(fieldWidth, 0);
     
     QObject::connect(&timer_, &QTimer::timeout, this, [this]() {
         lifeStep();
@@ -42,6 +43,11 @@ void Model::notifyAllCellsAreDead() const {
     for (const auto observer : observers_)
         observer->allCellsAreDead();
 }
+void Model::notifyStepStagnation() const {
+    for (const auto observer : observers_)
+        observer->stepStagnation();
+}
+
 
 void Model::addObserver(Observer* observer) {
     observers_.push_back(observer);
@@ -119,9 +125,18 @@ void Model::lifeStep() {
     field_ = newField;
     notifyStepPerformed(++currentStep_);
     
-    if (allCellsAreDead()) {
-        notifyAllCellsAreDead();
+    //const auto newHash = calcFieldHash();
+    // TODO: delete this after calcFieldHash will be implemented
+    const auto newHash = previousHash_ + 1;
+    if (newHash == previousHash_) {
+        notifyStepStagnation();
         // TODO: maybe stop here
+    } else {
+        previousHash_ = newHash;
+        if (allCellsAreDead()) {
+            notifyAllCellsAreDead();
+            // TODO: maybe stop here
+        }
     }
 }
 bool Model::allCellsAreDead() const {
@@ -171,4 +186,15 @@ void Model::resizeField(size_t w, size_t h) {
 
     if (oldHeight != height() || oldWidth != width())
         notifyFieldDimensionsChanged();
+}
+
+
+size_t Model::calcFieldHash() {
+    // TODO: Hash of vector
+    // template <class T>
+    // inline void hash_combine(std::size_t& seed, const T& v) {
+    //     std::hash<T> hasher;
+    //     seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    // }
+    return 0;
 }

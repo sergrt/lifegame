@@ -8,14 +8,16 @@ namespace Ui {
 }
 
 class Controller {
+    ////////////////////////////////
+    // 'Controller' class of MVC pattern. Encapsulates initial object creation,
+    // and routing of events from Views to Model
 public:
     Controller();
 
     // Initial setup of views
     void setupViews(Ui::LifeClass* const ui) const;
 
-
-    ////////
+    ////////////////////////////////
     // UI messages handling
 
     // Randomize field
@@ -43,13 +45,14 @@ public:
     void resizeField(size_t width, size_t height) const;
 
 
-    ////////
+    ////////////////////////////////
     // Getters
 
     // Get if field editable
     bool fieldEditable() const;
 
 private:
+    ////////////////////////////////
     // MVC stuff
     std::unique_ptr<Model> model_;
     std::unique_ptr<Grid> view_; // Grid view
