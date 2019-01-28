@@ -4,6 +4,8 @@
 #include "controller.h"
 
 class Life : public QMainWindow {
+    ////////////////////////////////
+    // Main class
     Q_OBJECT
 
 public:
@@ -12,6 +14,9 @@ public:
 private:
     Ui::LifeClass ui;
     Controller controller_;
+
 protected:
+    // Override paint event to perform initial setup of the MVC pattern
+    // at first repaint
     void paintEvent(QPaintEvent*) override;
 };

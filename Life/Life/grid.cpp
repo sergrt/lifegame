@@ -6,7 +6,6 @@
 Grid::Grid(Model* model, Controller* controller)
     : model_{ model },
       controller_{ controller } {
-
     model_->addObserver(this);
 }
 
@@ -37,18 +36,16 @@ int Grid::cellHeight()  {
     return *cellHeight_;
 }
 
-void Grid::paintEvent(QPaintEvent* e) {
+void Grid::paintGrid() {
     QPainter painter(this);
-    //painter.setRenderHint(QPainter::Antialiasing);
-    
+    painter.setPen(QColor(0, 0, 0));
+
     const auto rowCount = model_->height();
     const auto colCount = model_->width();
-
     const auto cellW = cellWidth();
     const auto cellH = cellHeight();
 
-    painter.setPen(QColor(0, 0, 0));
-
+    // Draw grid
     for (size_t i = 0; i <= rowCount; ++i) {
         const float y = 0 + i * cellH;
         painter.drawLine(0, y, colCount * cellW, y);
@@ -58,6 +55,15 @@ void Grid::paintEvent(QPaintEvent* e) {
         const float x = 0 + i * cellW;
         painter.drawLine(x, 0, x, rowCount * cellH);
     }
+}
+
+void Grid::paintCells() {
+    QPainter painter(this);
+    const auto cellW = cellWidth();
+    const auto cellH = cellHeight();
+
+    const auto filledBrush = QBrush(QColor(0, 0, 0));
+    const auto emptyBrush = QBrush(QColor(255, 255, 255));
 
     // Paint cells
     for (size_t row = 0; row < model_->height(); ++row) {
@@ -67,12 +73,15 @@ void Grid::paintEvent(QPaintEvent* e) {
             float y = row * cellH + 1;
             float cx = cellW - 1;
             float cy = cellH - 1;
-            const auto color = model_->item(row, col) == 0 ? QColor(255, 255, 255) : QColor(0, 0, 0);
-            const QBrush brush(color);
+            const auto& brush = model_->item(Row(row), Column(col)) == 0 ? emptyBrush : filledBrush;
             painter.fillRect(x, y, cx, cy, brush);
         }
     }
+}
 
+void Grid::paintEvent(QPaintEvent* e) {
+    paintGrid();
+    paintCells();
     QWidget::paintEvent(e);
 }
 

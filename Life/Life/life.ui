@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>695</width>
-    <height>369</height>
+    <height>416</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,9 +25,9 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="2">
-        <widget class="QPushButton" name="clear">
+        <widget class="QPushButton" name="reset">
          <property name="text">
-          <string>Clear</string>
+          <string>Reset</string>
          </property>
         </widget>
        </item>
@@ -89,10 +89,10 @@
           <item row="1" column="0">
            <widget class="QSlider" name="speed">
             <property name="minimum">
-             <number>25</number>
+             <number>5</number>
             </property>
             <property name="maximum">
-             <number>3000</number>
+             <number>2000</number>
             </property>
             <property name="singleStep">
              <number>25</number>

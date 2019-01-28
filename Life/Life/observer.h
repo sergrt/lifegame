@@ -2,16 +2,20 @@
 
 class Observer {
     ////////////////////////////////
+    // Observer pattern class. Model class is the subject.
     // Class to be inherited by any entities, which want to be aware about
-    // what is going on with Model
+    // what is going on with Model.
+
 protected:
-    Observer() {}
+    Observer() = default;
+
+public:
     // Disabling copy constructor and copy assignment operator also disables
     // move constructor and move assignment operator.
     Observer(const Observer&) = delete;
-    Observer& operator=(const Observer&) = delete;    
-public:
-    virtual ~Observer() {}
+    Observer& operator=(const Observer&) = delete;
+
+    virtual ~Observer() = default;
     
     // Handler of the event that field dimensions has been changed
     virtual void fieldDimensionsChanged() {}
@@ -22,7 +26,7 @@ public:
     // Handler of the event that step with number 'step' has been performed
     virtual void stepPerformed(int step) {}
 
-    // Hander of the event that all cells are dead
+    // Handler of the event that all cells are dead
     virtual void allCellsAreDead() {}
 
     // Handler of the event that step repeats last one

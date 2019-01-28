@@ -11,6 +11,7 @@ class Controller {
     ////////////////////////////////
     // 'Controller' class of MVC pattern. Encapsulates initial object creation,
     // and routing of events from Views to Model
+
 public:
     Controller();
 
@@ -44,6 +45,8 @@ public:
     // Resize field to supplied dimensions
     void resizeField(size_t width, size_t height) const;
 
+    // Reset model - reset field state, reset step, etc.
+    void resetModel() const;
 
     ////////////////////////////////
     // Getters

@@ -51,6 +51,9 @@
     <ClCompile Include="ui_controls_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="subject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -62,10 +65,13 @@
     <ClInclude Include="controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NamedType.h">
+    <ClInclude Include="model_named_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="model_named_types.h">
+    <ClInclude Include="named_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="subject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

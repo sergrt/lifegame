@@ -1,62 +1,20 @@
 #include "stdafx.h"
 #include "model.h"
-#include "observer.h"
 #include <random>
 
+const auto initialFieldWidth = size_t(24);
+const auto initialFieldHeight = size_t(24);
+
 Model::Model()
-    : simulationSpeed_ { 500 },
+    : stepDelay_{ 500 },
     currentStep_ { 0 },
-    previousHash_ { 0 } {    
-    const auto fieldWidth = size_t(24);
-    const auto fieldHeight = size_t(24);
-    field_.resize(fieldHeight);
-    for (auto& f : field_)
-        f.resize(fieldWidth, 0);
-    
+    previousHash_ { 0 } {
+    field_.resize(initialFieldHeight, std::vector<int>(initialFieldWidth, 0));
+
+    // Set timer function - perform simulation step at every timeout
     QObject::connect(&timer_, &QTimer::timeout, this, [this]() {
         lifeStep();
-        notifyFieldChanged();
     });
-    //timer_.start(500);
-}
-
-Model::~Model() {
-}
-
-void Model::notifyFieldDimensionsChanged() const {
-    for (const auto observer : observers_)
-        observer->fieldDimensionsChanged();
-}
-void Model::notifyFieldChanged() const {
-    for (const auto observer : observers_)
-        observer->fieldChanged();
-}
-void Model::notifySimulationStopped() const {
-    for (const auto observer : observers_)
-        observer->simulationStopped();
-}
-void Model::notifyStepPerformed(int step) const {
-    for (const auto observer : observers_)
-        observer->stepPerformed(step);
-}
-void Model::notifyAllCellsAreDead() const {
-    for (const auto observer : observers_)
-        observer->allCellsAreDead();
-}
-void Model::notifyStepStagnation() const {
-    for (const auto observer : observers_)
-        observer->stepStagnation();
-}
-
-
-void Model::addObserver(Observer* observer) {
-    observers_.push_back(observer);
-}
-
-void Model::removeObserver(Observer* observer) {
-    observers_.erase(
-        std::find(std::begin(observers_), std::end(observers_), observer)
-    );
 }
 
 void Model::randomize() {
@@ -87,18 +45,18 @@ size_t Model::height() const {
     return field_.size();
 }
 
-int Model::item(size_t row, size_t col) const {
-    return field_[row][col];
+int Model::item(Row row, Column col) const {
+    return field_[row.get()][col.get()];
 }
 
-int Model::neighboursCount(int row, int col) {
+int Model::neighborsCount(int row, int col) {
     int res = 0;
     for (int r = row - 1; r <= row + 1 && r < (int)field_.size(); ++r) {
         if (r >= 0) {
             for (int c = col - 1; c <= col + 1 && c < (int)field_[r].size(); ++c) {
                 if (c >= 0) {
                     if (!(r == row && c == col))
-                        res += item(r, c) == 1 ? 1 : 0;
+                        res += item(Row(r), Column(c)) == 1 ? 1 : 0;
                 }
             }
         }
@@ -107,10 +65,11 @@ int Model::neighboursCount(int row, int col) {
 }
 
 void Model::lifeStep() {
+    // Use Singe-entry single-exit here to allow all notifications to be fired
     auto newField = field_;
     for (size_t row = 0; row < field_.size(); ++row) {
         for (size_t col = 0; col < field_[row].size(); ++ col) {
-            auto n = neighboursCount(row, col);
+            const auto n = neighborsCount(row, col);
             if (field_[row][col] == 1) {
                 if (n < 2)
                     newField[row][col] = 0;
@@ -123,28 +82,28 @@ void Model::lifeStep() {
         }
     }
     field_ = newField;
+    // This notification should be here to notify that step performed prior to
+    // stagnation and all-cells-dead detections
     notifyStepPerformed(++currentStep_);
-    
-    //const auto newHash = calcFieldHash();
-    // TODO: delete this after calcFieldHash will be implemented
-    const auto newHash = previousHash_ + 1;
+
+    const auto newHash = calcFieldHash();
     if (newHash == previousHash_) {
         notifyStepStagnation();
-        // TODO: maybe stop here
+        stopSimulation();
     } else {
         previousHash_ = newHash;
         if (allCellsAreDead()) {
             notifyAllCellsAreDead();
-            // TODO: maybe stop here
+            stopSimulation();
         }
     }
+    notifyFieldChanged();
 }
+
 bool Model::allCellsAreDead() const {
     for (const auto& row : field_) {
-        for (const auto& cell : row) {
-            if (cell != 0)
-                return false;
-        }
+        if (std::find_if(row.cbegin(), row.cend(), [](const int cell) { return cell != 0; }) != row.cend())
+            return false;
     }
     return true;
 }
@@ -156,24 +115,32 @@ void Model::toggleFieldItem(Row row, Column col) {
 }
 
 void Model::startSimulation() {
-    timer_.start(simulationSpeed_);
+    timer_.start(stepDelay_);
 }
+
 void Model::stopSimulation() {
     timer_.stop();
-}
-void Model::singleStep() {
-    stopSimulation();
     notifySimulationStopped();
+}
+
+bool Model::simulationRunning() const {
+    return timer_.isActive();
+}
+
+void Model::singleStep() {
+    if (simulationRunning())
+        stopSimulation();
     lifeStep();
-    notifyFieldChanged();
 }
-int Model::simulationSpeed() const {
-    return simulationSpeed_;
+
+int Model::simulationStepDelay() const {
+    return stepDelay_;
 }
-void Model::setSimulationSpeed(int s) {
-    simulationSpeed_ = s;
-    if (timer_.isActive())
-        timer_.start(simulationSpeed_);
+
+void Model::setSimulationSpeed(int speed) {
+    stepDelay_ = speed;
+    if (simulationRunning())
+        startSimulation();
 }
 
 void Model::resizeField(size_t w, size_t h) {
@@ -188,13 +155,22 @@ void Model::resizeField(size_t w, size_t h) {
         notifyFieldDimensionsChanged();
 }
 
+void Model::reset() {
+    if (simulationRunning())
+        stopSimulation();
+    
+    currentStep_ = 0;
+    for (auto& row : field_)
+        std::fill(row.begin(), row.end(), 0);
+    
+    notifyFieldChanged();
+}
 
-size_t Model::calcFieldHash() {
-    // TODO: Hash of vector
-    // template <class T>
-    // inline void hash_combine(std::size_t& seed, const T& v) {
-    //     std::hash<T> hasher;
-    //     seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    // }
-    return 0;
+size_t Model::calcFieldHash() const {
+    size_t seed = 0;
+    for (const auto& row : field_) {
+        for (const auto& cell : row)
+            hashCombine(seed, cell);
+    }
+    return seed;
 }

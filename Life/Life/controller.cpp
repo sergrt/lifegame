@@ -10,9 +10,11 @@ Controller::Controller()
 }
 
 void Controller::setupViews(Ui::LifeClass* const ui) const {
+    // TODO: Here is a mix of abstraction layers, consider to refactor
     ui->frameGrid->setLayout(new QGridLayout());
     ui->frameGrid->layout()->addWidget(view_.get());
-    uiControlsView_->setUiPtr(ui);
+
+    uiControlsView_->setupUi(ui);
 }
 
 void Controller::randomize() const {
@@ -48,4 +50,8 @@ bool Controller::fieldEditable() const {
 }
 void Controller::resizeField(size_t width, size_t height) const {
     model_->resizeField(width, height);
+}
+
+void Controller::resetModel() const {
+    model_->reset();
 }

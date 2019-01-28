@@ -10,18 +10,27 @@ UiControlsView::UiControlsView(Model* model, Controller* controller)
     
     model_->addObserver(this);
 }
-void UiControlsView::setUiPtr(Ui::LifeClass* const ui) {
-    ui_ = ui;
 
+UiControlsView::~UiControlsView() {
+    model_->removeObserver(this);
+}
+
+void UiControlsView::setupUi(Ui::LifeClass* const ui) {
+    ui_ = ui;
+    syncUi();
+    setupUiSignals();
+}
+
+void UiControlsView::syncUi() const {
     ui_->manual->setChecked(controller_->fieldEditable());
-    ui_->speed->setValue(model_->simulationSpeed());
+    ui_->speed->setValue(model_->simulationStepDelay());
     ui_->width->setValue(model_->width());
     syncWidthLabelText();
     ui_->height->setValue(model_->height());
     syncHeightLabelText();
-    
-    // UI controls connections to the Controller.
-    // Used as a simplest approach
+}
+
+void UiControlsView::setupUiSignals() {
     connect(ui_->randomize, &QPushButton::clicked, this, [this]() {
         controller_->randomize();
     });
@@ -29,7 +38,7 @@ void UiControlsView::setUiPtr(Ui::LifeClass* const ui) {
         controller_->setFieldEditable(!ui_->manual->isChecked());
     });
     connect(ui_->runPause, &QPushButton::clicked, this, [this]() {
-        const bool isRunning = !ui_->runPause->isChecked();
+        const auto isRunning = !ui_->runPause->isChecked();
         if (isRunning)
             controller_->stopSimulation();
         else
@@ -48,35 +57,40 @@ void UiControlsView::setUiPtr(Ui::LifeClass* const ui) {
     });
     connect(ui_->height, &QSlider::valueChanged, this, [this]() {
         syncHeightLabelText();
-        ui_->heightLabel->setText(QString("%1").arg(ui_->height->value()));
         controller_->resizeField(ui_->width->value(),
             ui_->height->value());
     });
-}
-UiControlsView::~UiControlsView() {
-    model_->removeObserver(this);
+    connect(ui_->reset, &QPushButton::clicked, this, [this]() {
+        controller_->resetModel();
+        ui_->log->clear();
+    });
 }
 
 void UiControlsView::syncWidthLabelText() const {
     ui_->widthLabel->setText(QString("%1").arg(ui_->width->value()));
 }
+
 void UiControlsView::syncHeightLabelText() const {
     ui_->heightLabel->setText(QString("%1").arg(ui_->height->value()));
 }
 
 void UiControlsView::simulationStopped() {
-    if (ui_)
+    if (ui_) {
         ui_->runPause->setChecked(false);
+        ui_->log->append(QString("Simulation stopped"));
+    }
 }
 
 void UiControlsView::stepPerformed(int step) {
     if (ui_)
         ui_->log->append(QString("Step performed: %1").arg(step));
 }
+
 void UiControlsView::allCellsAreDead() {
     if (ui_)
         ui_->log->append("All cells are dead");
 }
+
 void UiControlsView::stepStagnation() {
     if (ui_)
         ui_->log->append("Step stagnation detected");

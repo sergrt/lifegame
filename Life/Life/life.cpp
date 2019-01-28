@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "life.h"
 
-std::once_flag flagSetupView;
+std::once_flag flagSetupView; // Initial setup flag
 
 Life::Life(QWidget *parent)
     : QMainWindow(parent) {
