@@ -9,10 +9,10 @@ Model::Model()
     : stepDelay_{ 500 },
     currentStep_ { 0 },
     previousHash_ { 0 } {
-    field_.resize(initialFieldHeight, std::vector<int>(initialFieldWidth, 0));
 
+    field_.resize(initialFieldHeight, std::vector<int>(initialFieldWidth, 0));
     // Set timer function - perform simulation step at every timeout
-    QObject::connect(&timer_, &QTimer::timeout, this, [this]() {
+    connect(&timer_, &QTimer::timeout, this, [this]() {
         lifeStep();
     });
 }
@@ -38,10 +38,14 @@ void Model::randomize() {
 }
 
 size_t Model::width() const {
+    if (field_.empty())
+        throw std::logic_error("Trying to get field width before field initialization");
     return field_[0].size();
 }
 
 size_t Model::height() const {
+    if (field_.empty())
+        throw std::logic_error("Trying to get field height before field initialization");
     return field_.size();
 }
 
@@ -49,16 +53,12 @@ int Model::item(Row row, Column col) const {
     return field_[row.get()][col.get()];
 }
 
-int Model::neighborsCount(int row, int col) {
+int Model::neighborsCount(size_t row, size_t col) {
     int res = 0;
-    for (int r = row - 1; r <= row + 1 && r < (int)field_.size(); ++r) {
-        if (r >= 0) {
-            for (int c = col - 1; c <= col + 1 && c < (int)field_[r].size(); ++c) {
-                if (c >= 0) {
-                    if (!(r == row && c == col))
-                        res += item(Row(r), Column(c)) == 1 ? 1 : 0;
-                }
-            }
+    for (size_t r = std::max(0, static_cast<int>(row) - 1); r < std::min(row + 2, field_.size()); ++r) {
+        for (size_t c = std::max(0, static_cast<int>(col) - 1); c < std::min(col + 2, field_[r].size()); ++c) {
+            if (!(r == row && c == col))
+                res += item(Row(r), Column(c)) == 1 ? 1 : 0;
         }
     }
     return res;
@@ -71,9 +71,7 @@ void Model::lifeStep() {
         for (size_t col = 0; col < field_[row].size(); ++ col) {
             const auto n = neighborsCount(row, col);
             if (field_[row][col] == 1) {
-                if (n < 2)
-                    newField[row][col] = 0;
-                else if (n > 3)
+                if (n < 2 || n > 3)
                     newField[row][col] = 0;
             } else {
                 if (n == 3)

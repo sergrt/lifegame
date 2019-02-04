@@ -24,9 +24,9 @@ void UiControlsView::setupUi(Ui::LifeClass* const ui) {
 void UiControlsView::syncUi() const {
     ui_->manual->setChecked(controller_->fieldEditable());
     ui_->speed->setValue(model_->simulationStepDelay());
-    ui_->width->setValue(model_->width());
+    ui_->width->setValue(static_cast<int>(model_->width()));
     syncWidthLabelText();
-    ui_->height->setValue(model_->height());
+    ui_->height->setValue(static_cast<int>(model_->height()));
     syncHeightLabelText();
 }
 
@@ -67,11 +67,13 @@ void UiControlsView::setupUiSignals() {
 }
 
 void UiControlsView::syncWidthLabelText() const {
-    ui_->widthLabel->setText(QString("%1").arg(ui_->width->value()));
+    if (ui_)
+        ui_->widthLabel->setText(QString("%1").arg(ui_->width->value()));
 }
 
 void UiControlsView::syncHeightLabelText() const {
-    ui_->heightLabel->setText(QString("%1").arg(ui_->height->value()));
+    if (ui_)
+        ui_->heightLabel->setText(QString("%1").arg(ui_->height->value()));
 }
 
 void UiControlsView::simulationStopped() {

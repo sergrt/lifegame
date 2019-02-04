@@ -66,7 +66,7 @@ private:
 
     // Calculate number of alive neighbors of the cell, indicated by
     // supplied 'row' and 'col'
-    int neighborsCount(int row, int col);
+    int neighborsCount(size_t row, size_t col);
 
     // Check if all cells are dead
     bool allCellsAreDead() const;

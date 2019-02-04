@@ -5,7 +5,8 @@
 
 Grid::Grid(Model* model, Controller* controller)
     : model_{ model },
-      controller_{ controller } {
+    controller_{ controller } {
+
     model_->addObserver(this);
 }
 
@@ -20,6 +21,7 @@ void Grid::calcCellDimensions() {
     const int height = this->height();
     cellWidth_ = (width - 1) / colCount;
     cellHeight_ = (height - 1) / rowCount;
+    qDebug(QString("cellWidth_ = %1, cellHeight = %2").arg(*cellWidth_).arg(*cellHeight_).toStdString().c_str());
 }
 
 int Grid::cellWidth() {
@@ -47,12 +49,12 @@ void Grid::paintGrid() {
 
     // Draw grid
     for (size_t i = 0; i <= rowCount; ++i) {
-        const float y = 0 + i * cellH;
+        const int y = i * cellH;
         painter.drawLine(0, y, colCount * cellW, y);
     }
 
     for (size_t i = 0; i <= colCount; ++i) {
-        const float x = 0 + i * cellW;
+        const int x = i * cellW;
         painter.drawLine(x, 0, x, rowCount * cellH);
     }
 }
@@ -69,10 +71,10 @@ void Grid::paintCells() {
     for (size_t row = 0; row < model_->height(); ++row) {
         for (size_t col = 0; col < model_->width(); ++col) {
             // get cell rect
-            float x = col * cellW + 1;
-            float y = row * cellH + 1;
-            float cx = cellW - 1;
-            float cy = cellH - 1;
+            const int x = col * cellW + 1;
+            const int y = row * cellH + 1;
+            const int cx = cellW - 1;
+            const int cy = cellH - 1;
             const auto& brush = model_->item(Row(row), Column(col)) == 0 ? emptyBrush : filledBrush;
             painter.fillRect(x, y, cx, cy, brush);
         }
