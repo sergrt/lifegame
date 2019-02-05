@@ -5,12 +5,19 @@
 const auto initialFieldWidth = size_t(24);
 const auto initialFieldHeight = size_t(24);
 
-Model::Model()
-    : stepDelay_{ 500 },
-    currentStep_ { 0 },
-    previousHash_ { 0 } {
+bool LifeEntity::isAlive() const {
+    return value_ != 0;
+}
+void LifeEntity::setAlive(bool alive) {
+    value_ = alive;
+}
 
-    field_.resize(initialFieldHeight, std::vector<int>(initialFieldWidth, 0));
+
+Model::Model()
+    : stepDelay_{ 200 },
+    currentStep_ { 0 } {
+
+    field_.resize(initialFieldHeight, std::vector<LifeEntity>(initialFieldWidth, LifeEntity()));
     // Set timer function - perform simulation step at every timeout
     connect(&timer_, &QTimer::timeout, this, [this]() {
         lifeStep();
@@ -21,20 +28,71 @@ void Model::randomize() {
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(0, 2);
-    /*
     for (auto& row : field_) {
         for (auto& cell : row)
-            cell = dist(mt) > 1 ? 1 : 0;
+            cell.setAlive(dist(mt) > 1 ? true : false);
     }
-    */
-    field_[0][1] = 1;
-    
-    field_[1][2] = 1;
-
-    field_[2][0] = 1;
-    field_[2][1] = 1;
-    field_[2][2] = 1;
     notifyFieldChanged();
+}
+
+void Model::spawnBlinker() {
+    if (height() >= 4 && width() >= 3) {
+        field_[1][2].setAlive(true);
+        field_[2][2].setAlive(true);
+        field_[3][2].setAlive(true);
+        notifyFieldChanged();
+    }
+}
+
+void Model::spawnToad() {
+    if (height() >= 4 && width() >= 5) {
+        field_[2][2].setAlive(true);
+        field_[2][3].setAlive(true);
+        field_[2][4].setAlive(true);
+        field_[3][1].setAlive(true);
+        field_[3][2].setAlive(true);
+        field_[3][3].setAlive(true);
+        notifyFieldChanged();
+    }
+}
+
+void Model::spawnBeacon() {
+    if (height() >= 5 && width() >= 5) {
+        field_[1][1].setAlive(true);
+        field_[1][2].setAlive(true);
+        field_[2][1].setAlive(true);
+
+        field_[3][4].setAlive(true);
+        field_[4][3].setAlive(true);
+        field_[4][4].setAlive(true);
+        notifyFieldChanged();
+    }
+}
+
+void Model::spawnGlider() {
+    if (height() >= 3 && width() >= 3) {
+        field_[0][1].setAlive(true);
+        field_[1][2].setAlive(true);
+        field_[2][0].setAlive(true);
+        field_[2][1].setAlive(true);
+        field_[2][2].setAlive(true);
+        notifyFieldChanged();
+    }
+}
+
+void Model::spawnLightweightSpaceship() {
+    if (height() >= 6 && width() >= 7) {
+        field_[2][3].setAlive(true);
+        field_[2][4].setAlive(true);
+        field_[2][5].setAlive(true);
+        field_[2][6].setAlive(true);
+        field_[3][6].setAlive(true);
+        field_[4][6].setAlive(true);
+        field_[5][5].setAlive(true);
+        field_[3][2].setAlive(true);
+        field_[5][3].setAlive(true);
+        notifyFieldChanged();
+    }
 }
 
 size_t Model::width() const {
@@ -49,7 +107,7 @@ size_t Model::height() const {
     return field_.size();
 }
 
-int Model::item(Row row, Column col) const {
+LifeEntity Model::item(Row row, Column col) const {
     return field_[row.get()][col.get()];
 }
 
@@ -58,7 +116,7 @@ int Model::neighborsCount(size_t row, size_t col) {
     for (size_t r = std::max(0, static_cast<int>(row) - 1); r < std::min(row + 2, field_.size()); ++r) {
         for (size_t c = std::max(0, static_cast<int>(col) - 1); c < std::min(col + 2, field_[r].size()); ++c) {
             if (!(r == row && c == col))
-                res += item(Row(r), Column(c)) == 1 ? 1 : 0;
+                res += item(Row(r), Column(c)).isAlive() ? 1 : 0;
         }
     }
     return res;
@@ -70,12 +128,12 @@ void Model::lifeStep() {
     for (size_t row = 0; row < field_.size(); ++row) {
         for (size_t col = 0; col < field_[row].size(); ++ col) {
             const auto n = neighborsCount(row, col);
-            if (field_[row][col] == 1) {
+            if (field_[row][col].isAlive()) {
                 if (n < 2 || n > 3)
-                    newField[row][col] = 0;
+                    newField[row][col].setAlive(false);
             } else {
                 if (n == 3)
-                    newField[row][col] = 1;
+                    newField[row][col].setAlive(true);
             }
         }
     }
@@ -85,11 +143,18 @@ void Model::lifeStep() {
     notifyStepPerformed(++currentStep_);
 
     const auto newHash = calcFieldHash();
-    if (newHash == previousHash_) {
+    // Only previous step is checked for repeated configuration, so periodic
+    // oscillations are not detected as stagnation. To do this - use vector of
+    // hashes and check for periodic repetitions
+    if (!previousHashes_.empty() && newHash == previousHashes_[0]) {
         notifyStepStagnation();
         stopSimulation();
     } else {
-        previousHash_ = newHash;
+        if (previousHashes_.empty())
+            previousHashes_.push_back(newHash);
+        else
+            previousHashes_[0] = newHash;
+
         if (allCellsAreDead()) {
             notifyAllCellsAreDead();
             stopSimulation();
@@ -100,15 +165,15 @@ void Model::lifeStep() {
 
 bool Model::allCellsAreDead() const {
     for (const auto& row : field_) {
-        if (std::find_if(row.cbegin(), row.cend(), [](const int cell) { return cell != 0; }) != row.cend())
+        if (std::find_if(row.cbegin(), row.cend(), [](const auto cell) { return cell.isAlive(); }) != row.cend())
             return false;
     }
     return true;
 }
 
 void Model::toggleFieldItem(Row row, Column col) {
-    const auto oldVal = field_[row.get()][col.get()];
-    field_[row.get()][col.get()] = oldVal == 0 ? 1 : 0;
+    const auto oldItem = field_[row.get()][col.get()];
+    field_[row.get()][col.get()].setAlive(!oldItem.isAlive());
     notifyFieldChanged();
 }
 
@@ -118,6 +183,7 @@ void Model::startSimulation() {
 
 void Model::stopSimulation() {
     timer_.stop();
+    previousHashes_.clear();
     notifySimulationStopped();
 }
 
@@ -129,6 +195,7 @@ void Model::singleStep() {
     if (simulationRunning())
         stopSimulation();
     lifeStep();
+    previousHashes_.clear();
 }
 
 int Model::simulationStepDelay() const {
@@ -144,10 +211,10 @@ void Model::setSimulationSpeed(int speed) {
 void Model::resizeField(size_t w, size_t h) {
     const size_t oldWidth = width();
     const size_t oldHeight = height();
-    field_.resize(h, std::vector<int>(w, 0));
+    field_.resize(h, std::vector<LifeEntity>(w, LifeEntity()));
     
     for (size_t sz = std::min(height(), oldHeight), i = 0; i < sz; ++i)
-        field_[i].resize(w, 0);
+        field_[i].resize(w, LifeEntity());
 
     if (oldHeight != height() || oldWidth != width())
         notifyFieldDimensionsChanged();
@@ -159,7 +226,7 @@ void Model::reset() {
     
     currentStep_ = 0;
     for (auto& row : field_)
-        std::fill(row.begin(), row.end(), 0);
+        std::fill(row.begin(), row.end(), LifeEntity());
     
     notifyFieldChanged();
 }

@@ -18,6 +18,7 @@ UiControlsView::~UiControlsView() {
 void UiControlsView::setupUi(Ui::LifeClass* const ui) {
     ui_ = ui;
     syncUi();
+    setupSpawnButton();
     setupUiSignals();
 }
 
@@ -28,6 +29,35 @@ void UiControlsView::syncUi() const {
     syncWidthLabelText();
     ui_->height->setValue(static_cast<int>(model_->height()));
     syncHeightLabelText();
+}
+
+void UiControlsView::setupSpawnButton() {
+    QAction* blinker = new QAction("Blinker");
+    connect(blinker, &QAction::triggered, this, [this]() {
+        controller_->spawnBlinker();
+    });
+    QAction* toad = new QAction("Toad");
+    connect(toad, &QAction::triggered, this, [this]() {
+        controller_->spawnToad();
+    });
+    QAction* beacon = new QAction("Beacon");
+    connect(beacon, &QAction::triggered, this, [this]() {
+        controller_->spawnBeacon();
+    });
+    QAction* glider = new QAction("Glider");
+    connect(glider, &QAction::triggered, this, [this]() {
+        controller_->spawnGlider();
+    });
+    QAction* lightweightSpaceship = new QAction("Lightweight spaceship");
+    connect(lightweightSpaceship, &QAction::triggered, this, [this]() {
+        controller_->spawnLightweightSpaceship();
+    });
+
+    ui_->spawn->addAction(blinker);
+    ui_->spawn->addAction(toad);
+    ui_->spawn->addAction(beacon);
+    ui_->spawn->addAction(glider);
+    ui_->spawn->addAction(lightweightSpaceship);
 }
 
 void UiControlsView::setupUiSignals() {

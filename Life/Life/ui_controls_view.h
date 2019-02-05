@@ -58,6 +58,9 @@ private:
     // Set up signals/slots connecting UI elements with Controller
     void setupUiSignals();
 
+    // Set up spawn button actions and handlers
+    void setupSpawnButton();
+
     ////////////////////////////////
     // Non-owning pointers to MVC objects
     Model* model_;

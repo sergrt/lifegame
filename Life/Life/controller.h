@@ -21,9 +21,6 @@ public:
     ////////////////////////////////
     // UI messages handling
 
-    // Randomize field
-    void randomize() const;
-
     // Route click on cell
     void fieldItemClick(Row row, Column col) const;
 
@@ -47,6 +44,18 @@ public:
 
     // Reset model - reset field state, reset step, etc.
     void resetModel() const;
+
+    ////////////////////////////////
+    
+    // Randomize field
+    void randomize() const;
+
+    // Set field content to one of the predefined figures
+    void spawnBlinker() const;
+    void spawnToad() const;
+    void spawnBeacon() const;
+    void spawnGlider() const;
+    void spawnLightweightSpaceship() const;
 
     ////////////////////////////////
     // Getters

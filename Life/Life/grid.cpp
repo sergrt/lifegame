@@ -75,7 +75,7 @@ void Grid::paintCells() {
             const int y = row * cellH + 1;
             const int cx = cellW - 1;
             const int cy = cellH - 1;
-            const auto& brush = model_->item(Row(row), Column(col)) == 0 ? emptyBrush : filledBrush;
+            const auto& brush = model_->item(Row(row), Column(col)).isAlive() ? filledBrush : emptyBrush;
             painter.fillRect(x, y, cx, cy, brush);
         }
     }

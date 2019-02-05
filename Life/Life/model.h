@@ -3,6 +3,24 @@
 #include "model_named_types.h"
 #include "subject.h"
 
+class LifeEntity {
+public:
+    bool isAlive() const;
+    void setAlive(bool alive);
+private:
+    int value_ = 0;
+};
+
+namespace std {
+    template<>
+    struct hash<LifeEntity> {
+        size_t operator()(const LifeEntity& obj) const {
+            return std::hash<bool>()(obj.isAlive());
+        }
+    };
+}
+
+
 class Model : public QObject, public Subject {
     ////////////////////////////////
     // Model class of MVC pattern. This class encapsulates field and simulation
@@ -14,9 +32,6 @@ public:
 
     ////////////////////////////////
     // Handlers of external events, fired by Controller
-
-    // Set cells in a random state
-    void randomize();
 
     // Toggle cell, indicated by supplied 'row' and 'col' to inverse state
     void toggleFieldItem(Row row, Column col);
@@ -43,11 +58,25 @@ public:
     // Reset model: clear field, reset step number etc.
     void reset();
 
+    // Set cells in a random state
+    void randomize();
+
+    // Set field content to one of the predefined figures
+    void spawnBlinker();
+    void spawnToad();
+    void spawnBeacon();
+    void spawnPulsar();
+    void spawnPentadecathlon();
+    void spawnGlider();
+    void spawnLightweightSpaceship();
+    void spawnMiddleweightSpaceship();
+    void spawnHeavyweightSpaceship();
+
 private:
     ////////////////////////////////
     // Model data
 
-    std::vector<std::vector<int>> field_;
+    std::vector<std::vector<LifeEntity>> field_;
         // Field - vector of rows
     QTimer timer_;
         // Timer used to perform automatic simulation run
@@ -55,8 +84,8 @@ private:
         // Delay between simulation steps. Defines speed of the simulation
     int currentStep_;
         // Number of step of the simulation
-    size_t previousHash_;
-        // Hash of the previous field state. Used to detect field stagnation
+    std::vector<size_t> previousHashes_;
+        // Hashes of the previous field states. Used to detect field stagnation
 
     // Get if simulation is running
     bool simulationRunning() const;
@@ -95,6 +124,6 @@ public:
     
     // Get state of the cell at the position, indicated by supplied 'row' and
     // 'col'
-    int item(Row row, Column col) const;
+    LifeEntity item(Row row, Column col) const;
 };
 

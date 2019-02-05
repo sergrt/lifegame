@@ -21,6 +21,26 @@ void Controller::randomize() const {
     model_->randomize();
 }
 
+void Controller::spawnBlinker() const {
+    model_->spawnBlinker();
+}
+
+void Controller::spawnToad() const {
+    model_->spawnToad();
+}
+
+void Controller::spawnBeacon() const {
+    model_->spawnBeacon();
+}
+
+void Controller::spawnGlider() const {
+    model_->spawnGlider();
+}
+
+void Controller::spawnLightweightSpaceship() const {
+    model_->spawnLightweightSpaceship();
+}
+
 void Controller::fieldItemClick(Row row, Column col) const {
     model_->toggleFieldItem(row, col);
 }
